@@ -1,0 +1,6 @@
+{% ckan_extends %}
+
+{% block content_primary_nav %}
+  {{ super() }}
+  {{ h.build_nav_icon('dataset_problems', _('Problems'), id=pkg.name, icon='exclamation-triangle') }}
+{% endblock %}
