@@ -14,31 +14,31 @@
         <section class="module module-resource">
             <div class="module-content">
                 {% if h.check_access('package_update', {'id':pkg.id }) %}
-                    {% link_for _('Update problem'), named_route='problem_edit', id=1, package_id=pkg.name, class_='btn btn-default pull-right', icon='wrench' %}
+                    {% link_for _('Update problem'), named_route='problem_edit', id=problem.id, package_id=pkg.name, class_='btn btn-default pull-right', icon='wrench' %}
                 {% endif %}
 
                 <h1>{% block page_heading %}{{ _('Problem name') }}{% endblock %}</h1>
               
                 <div class="notes embedded-content">
-                    <p>Lorem ipsum</p>
+                    <p>{{ problem.description }}</p>
                 </div>
                 <table class="table table-striped table-bordered table-condensed">
                     <tbody>
                         <tr>
                             <th scope="row" class="dataset-label" width="25%">{{ _('ID') }}</th>
-                            <td class="dataset-details"></td>
+                            <td class="dataset-details">{{ problem.id }}</td>
                         </tr>
                         <tr>
                             <th scope="row" class="dataset-label" width="25%">{{ _('Status') }}</th>
-                            <td class="dataset-details"></td>
+                            <td class="dataset-details">{{ _( problem.current_status ) }}</td>
                         </tr>
                         <tr>
                             <th scope="row" class="dataset-label">{{ _('Author') }}</th>
-                            <td class="dataset-details"></td>
+                            <td class="dataset-details">{{ user.name }}</td>
                         </tr>
                         <tr>
                             <th scope="row" class="dataset-label">{{ _('Created') }}</th>
-                            <td class="dataset-details"></td>
+                            <td class="dataset-details">{{ problem.date_created }}</td>
                         </tr>
                     </tbody>
                 </table>

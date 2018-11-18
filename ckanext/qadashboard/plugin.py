@@ -29,7 +29,7 @@ class QadashboardPlugin(plugins.SingletonPlugin):
         
         map.connect(
             'problem_detail', 
-            '/dataset/problems/{package_id}/{id}',
+            '/dataset/problems/{package_id}/view/{id}',
             controller='ckanext.qadashboard.problem_controller:ProblemController',
             action='view_problem'
         )
@@ -39,6 +39,13 @@ class QadashboardPlugin(plugins.SingletonPlugin):
             '/dataset/problems/{package_id}/edit/{id}',
             controller='ckanext.qadashboard.problem_controller:ProblemController',
             action='edit_problem'
+        )
+        
+        map.connect(
+            'problem_save', 
+            '/dataset/problems/{package_id}/save',
+            controller='ckanext.qadashboard.problem_controller:ProblemController',
+            action='form_save'
         )
         
         return map

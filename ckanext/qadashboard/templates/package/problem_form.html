@@ -5,8 +5,39 @@
     {% block problem_form %}
         <section class="module module-resource">
             <div class="module-content">
-                <form id="problem-edit" class="dataset-form" method="post" action="" data-module="basic-form" novalidate>
+                <form id="problem-edit" class="dataset-form" method="post" action="{{ h.url_for('problem_save', package_id=pkg.name) }}" data-module="basic-form" novalidate>
+                
+                <input type="hidden" name="package_id" value="{{ c.pkg.id }}" />
+                <input type="hidden" name="action" value="{{ action }}" />
+                
+                {% block problem_title %}
                     {{ form.input('title', id='field-title', label=_('Title'), placeholder='', value='', error='', classes=['control-medium'], attrs={'class': 'form-control'}) }}
+                    {% if errors.title %}<span class="error-block">{{ errors.title }}</span>{% endif %}
+                {% endblock %}
+                
+                {% block problem_types %}
+                    <div class="form-group control-medium">
+                      <label for="field-type" class="control-label">{{ _('Type') }}</label>
+                      <div class="controls">
+                        <select id="field-type" name="type" class="form-control">
+                          {% for option in problem_types %}
+                            <option value="{{ option.id }}" selected="selected">{{ option.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                {% endblock %}
+                
+                {% block problem_description %}
+                    {{ form.markdown('description', id='field-description', label=_('Description'), placeholder=_('eg. information about the problem found'), value=problem.description, error=errors.description) }}
+                {% endblock %}
+                
+                {% block save_button %}
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit" name="save">{% block save_button_text %}{{ _('Save') }}{% endblock %}</button>
+                    </div>
+                {% endblock %}
+                
                 </form>
             </div>
         </section>

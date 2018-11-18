@@ -9,7 +9,7 @@ class QADashboardCommands (plugins.toolkit.CkanCommand):
     '''
     Creates needed plugin tables
     Use:
-        paster qadashboard initdb -c /etc/ckan/default/production.ini
+        paster --plugin=ckanext-qadashboard qadashboard initdb -c /etc/ckan/default/production.ini
     '''
 
     summary = __doc__.split('\n')[0]
@@ -32,7 +32,7 @@ class QADashboardCommands (plugins.toolkit.CkanCommand):
             self.log.error('Command %s not recognized' % (cmd,))
 
 
-    def initdb():
+    def initdb(self):
         
         plugin_model.init_tables()
-        self.log.info('All tables created.')
+        print('All tables created.')

@@ -25,7 +25,7 @@ setup(
 
     # Author details
     author='''Ana Mendoza''',
-    author_email='''ammendoza@uoc.edu''',
+    author_email='''anamendoza.ibz@gmail.com''',
 
     # Choose your license
     license='AGPL',

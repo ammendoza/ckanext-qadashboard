@@ -9,10 +9,12 @@
   {% block problem_table %}
     
     <ul class="list-group">
-      <li class="list-group-item">
-        <span class="badge">{{ _('Active') }}</span>
-        <a href="{{ h.url_for('problem_detail', id=1, package_id=pkg.name) }}">Cras justo odio</a>
-      </li>
+        {% for problem in problems %}
+          <li class="list-group-item">
+            <span class="badge">{{ _( problem.current_status ) }}</span>
+            <a href="{{ h.url_for('problem_detail', id=problem.id, package_id=pkg.name) }}">{{ problem.problem_type }}</a>
+          </li>
+        {% endfor %}
     </ul>
     
   {% endblock %}
