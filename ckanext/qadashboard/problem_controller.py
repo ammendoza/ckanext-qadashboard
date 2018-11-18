@@ -45,7 +45,7 @@ class ProblemController(toolkit.BaseController):
         except logic.NotAuthorized:
                 abort(403, _('Unauthorized to read dataset %s') % package_id)
 
-        return toolkit.render('package/problem_detail.html', extra_vars={})
+        return toolkit.render('package/problem_read.html', extra_vars={})
         
     def edit_problem(self, id, package_id):
     
@@ -65,4 +65,4 @@ class ProblemController(toolkit.BaseController):
         except logic.NotAuthorized:
                 abort(403, _('Unauthorized to read dataset %s') % package_id)
 
-        return toolkit.render('package/problem_edit.html', extra_vars={})
+        return toolkit.render('package/problem_form.html', extra_vars={})
