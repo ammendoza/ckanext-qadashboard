@@ -11,6 +11,11 @@ class Status(object):
     OPEN = u'Open'
     PENDING = u'Pending information'
     SOLVED = u'Solved'
+    
+    @staticmethod
+    def as_array():
+        return [Status.OPEN, Status.PENDING, Status.SOLVED]
+        
 
 problem_type_table = Table('problem_type', meta.metadata,
                 Column('id', types.UnicodeText, primary_key=True, default=_types.make_uuid),
@@ -76,6 +81,13 @@ class ProblemUpdate (domain_object.DomainObject):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
+            
+    @classmethod     
+    def by_problem(cls, problem_id):
+        q = model.Session.query(cls, model.user.User).\
+            join(model.user.User).\
+            filter(cls.problem_id == problem_id)
+        return q.all()
 
 mapper(ProblemType, problem_type_table)
 mapper(Problem, problem_table, properties={

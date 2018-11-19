@@ -10,26 +10,49 @@
                 <input type="hidden" name="package_id" value="{{ c.pkg.id }}" />
                 <input type="hidden" name="action" value="{{ action }}" />
                 
-                {% block problem_title %}
-                    {{ form.input('title', id='field-title', label=_('Title'), placeholder='', value='', error='', classes=['control-medium'], attrs={'class': 'form-control'}) }}
-                    {% if errors.title %}<span class="error-block">{{ errors.title }}</span>{% endif %}
-                {% endblock %}
+                {% if action == 'new' %}
                 
-                {% block problem_types %}
-                    <div class="form-group control-medium">
-                      <label for="field-type" class="control-label">{{ _('Type') }}</label>
-                      <div class="controls">
-                        <select id="field-type" name="type" class="form-control">
-                          {% for option in problem_types %}
-                            <option value="{{ option.id }}" selected="selected">{{ option.name }}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                    </div>
-                {% endblock %}
+                    {% block problem_title %}
+                        {{ form.input('title', id='field-title', label=_('Title'), placeholder='', value='', error='', classes=['control-medium'], attrs={'class': 'form-control'}) }}
+                        {% if errors.title %}<span class="error-block">{{ errors.title }}</span>{% endif %}
+                    {% endblock %}
+                    
+                    {% block problem_detail %}
+                        <div class="form-group control-medium">
+                          <label for="field-type" class="control-label">{{ _('Type') }}</label>
+                          <div class="controls">
+                            <select id="field-type" name="type" class="form-control">
+                              {% for option in problem_types %}
+                                <option value="{{ option.id }}" selected="selected">{{ option.name }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                    {% endblock %}
+                    
+                {% else %}
+                
+                    <input type="hidden" name="id" value="{{ problem.id }}" />
+                    
+                    {% block problem_status %}
+                    
+                        <div class="form-group control-medium">
+                          <label for="field-status" class="control-label">{{ _('Status') }}</label>
+                          <div class="controls">
+                            <select id="field-status" name="status" class="form-control">
+                              {% for option in status %}
+                                <option value="{{ option }}" {% if problem.current_status == option %}selected="selected"{% endif %}>{{ option }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                    
+                    {% endblock %}
+                
+                {% endif %}
                 
                 {% block problem_description %}
-                    {{ form.markdown('description', id='field-description', label=_('Description'), placeholder=_('eg. information about the problem found'), value=problem.description, error=errors.description) }}
+                    {{ form.markdown('description', id='field-description', label=_('Description'), placeholder=_('eg. information about the problem found') if action=='new' else _('eg. additional information about the problem'), value='', error=errors.description) }}
                 {% endblock %}
                 
                 {% block save_button %}

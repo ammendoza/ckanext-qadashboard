@@ -1,53 +1,79 @@
-{% extends "package/base.html" %}
+{% extends "package/read_base.html" %}
 
 {% block subtitle %}{{ _('Notified problems') }} - {{ super() }}{% endblock %}
 
 {% block breadcrumb_content_selected %}{% endblock %}
 {% block breadcrumb_content %}
   {{ super() }}
-  <li><a href="{{ h.url_for('dataset_problems', id=pkg.name) }}">{{ _('Problems') }}</a></li>
+  <li><a href="{{ h.url_for('dataset_problems', package_id=pkg.name) }}">{{ _('Problems') }}</a></li>
   <li class="active"><a href="">{{ _('Problem name') | truncate(30) }}</a></li>
 {% endblock %}
 
-{% block pre_primary %}
+{% block primary_content_inner %}
     {% block problem_detail %}
-        <section class="module module-resource">
-            <div class="module-content">
-                {% if h.check_access('package_update', {'id':pkg.id }) %}
-                    {% link_for _('Update problem'), named_route='problem_edit', id=problem.id, package_id=pkg.name, class_='btn btn-default pull-right', icon='wrench' %}
-                {% endif %}
+		{% if h.check_access('package_update', {'id':pkg.id }) %}
+			{% link_for _('Update problem'), named_route='problem_edit', id=problem.id, package_id=pkg.name, class_='btn btn-default pull-right', icon='wrench' %}
+		{% endif %}
 
-                <h1>{% block page_heading %}{{ _('Problem name') }}{% endblock %}</h1>
-              
-                <div class="notes embedded-content">
-                    <p>{{ problem.description }}</p>
-                </div>
-                <table class="table table-striped table-bordered table-condensed">
-                    <tbody>
-                        <tr>
-                            <th scope="row" class="dataset-label" width="25%">{{ _('ID') }}</th>
-                            <td class="dataset-details">{{ problem.id }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" class="dataset-label" width="25%">{{ _('Status') }}</th>
-                            <td class="dataset-details">{{ _( problem.current_status ) }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" class="dataset-label">{{ _('Author') }}</th>
-                            <td class="dataset-details">{{ user.name }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" class="dataset-label">{{ _('Created') }}</th>
-                            <td class="dataset-details">{{ problem.date_created }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+		<h1>{% block page_heading %}{{ _('Problem name') }}{% endblock %}</h1>
+	  
+		<div class="notes embedded-content">
+			<p>{{ problem.description }}</p>
+		</div>
+		<table class="table table-striped table-bordered table-condensed">
+			<tbody>
+				<tr>
+					<th scope="row" class="dataset-label" width="25%">{{ _('ID') }}</th>
+					<td class="dataset-details">{{ problem.id }}</td>
+				</tr>
+				<tr>
+					<th scope="row" class="dataset-label" width="25%">{{ _('Status') }}</th>
+					<td class="dataset-details">{{ _( problem.current_status ) }}</td>
+				</tr>
+				<tr>
+					<th scope="row" class="dataset-label">{{ _('Author') }}</th>
+					<td class="dataset-details">
+						<a href="{{ h.url_for('user.read', id=user.name) }}" class="image" title="{{ _('View profile') }}">
+							{{ h.gravatar((user.email_hash if user else ''), size=22) }} {{ user.name }}
+						</a>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row" class="dataset-label">{{ _('Created') }}</th>
+					<td class="dataset-details">{{ problem.date_created }}</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		{% block problem_updates %}
+
+			{% if updates %}
+				<h2>{{ _('Updates') }}</h2>
+			  
+				{% for update in updates %}
+					<p class="text-primary">
+						<a href="{{ h.url_for('update.User.read', id=update.User.name) }}" class="image" title="{{ _('View profile') }}">
+							{{ h.gravatar((update.User.email_hash if update.User else ''), size=22) }} {{ update.User.name }}
+						</a>
+						{% if aux_status != update.ProblemUpdate.status_id %}
+							{{ ('changed status to ') }} {{ update.ProblemUpdate.status_id }}
+						{% else %}
+							{{ _('added a comment') }}
+						{% endif %}
+						
+					</p>
+
+					<p>{{ update.ProblemUpdate.notes }}</p>
+					
+					<hr />
+					
+					{% set aux_status = update.ProblemUpdate.status_id %}
+				
+				{% endfor %}
+			{% endif %}
+			
+		{% endblock %}
     
   {% endblock %}
   
 {% endblock %}
-
-{% block primary_content %}{% endblock %}
-{% block secondary_content %}{% endblock %}

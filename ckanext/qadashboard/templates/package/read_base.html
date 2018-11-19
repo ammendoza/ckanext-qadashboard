@@ -2,5 +2,5 @@
 
 {% block content_primary_nav %}
   {{ super() }}
-  {{ h.build_nav_icon('dataset_problems', _('Problems'), id=pkg.name, icon='exclamation-triangle') }}
+  {{ h.build_nav_icon('dataset_problems', _('Problems'), package_id=pkg.name, icon='exclamation-triangle') }}
 {% endblock %}

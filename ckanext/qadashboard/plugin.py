@@ -22,7 +22,7 @@ class QadashboardPlugin(plugins.SingletonPlugin):
         
         map.connect(
             'dataset_problems', 
-            '/dataset/problems/{id}',
+            '/dataset/problems/{package_id}',
             controller='ckanext.qadashboard.problem_controller:ProblemController',
             action='view_dataset'
         )
