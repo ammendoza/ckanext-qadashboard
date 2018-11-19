@@ -37,8 +37,8 @@ class ProblemController(toolkit.BaseController):
         problems = _model.Problem.by_package(package_id=c.pkg.id)
 
         return toolkit.render('package/problems.html', extra_vars={
-            'problems': problems
-        })
+                'problems': problems
+            })
         
     def view_problem(self, id, package_id):
                 

@@ -9,12 +9,92 @@
 {% block secondary %}{% endblock %}
 
 {% block primary %}
-	{% resource 'qa-dashboard/qa-dashboard.js' %}
-	<div class="row">
-	  <div class="col-md-6">
-			<button data-module="page_views_chart">
-			</button>
-		</div>
-	  <div class="col-md-6">.col-md-6</div>
-	</div>
+    <section class="module module-qadashboard">
+        <div class="module-content">
+            {% resource 'qa-dashboard/qa-dashboard.js' %}
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>{{ _('Number of datasets by openness score') }}</h2>
+                    <canvas id="quality-level" height="150"></canvas>
+                    <script>
+                        var ctx = document.getElementById("quality-level").getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ["0", "1", "2", "3", "4", "5"],
+                                datasets: [{
+                                    label: '# of datasets',
+                                    data: [
+                                        {% for level in qa_levels %}
+                                            {{ level }},
+                                        {% endfor %}
+                                    ],
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255,99,132,1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero:true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                <div class="col-md-6">
+                    <h2>{{ _('Lowest scored datasets') }}</h2>
+                    {% if low_qa %}
+                        <ul class="list-group">
+                            {% for qa in low_qa %}
+                                <li class="list-group-item">
+                                    <span class="badge">{{ qa.level }}</span>
+                                    <a href="{{ h.url_for('package_show', id=qa.package.name) }}">{{ qa.package.title }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                    <h2>{{ _('Last problems reported') }}</h2>
+                    {% if problem_list %}
+                        <ul class="list-group">
+                            {% for problem in problem_list %}
+                                <li class="list-group-item">
+                                    <span class="badge">{{ problem.current_status }}</span>
+                                    <a href="{{ h.url_for('problem_detail', id=problem.id, package_id=problem.package_id) }}">{{ problem.problem_type }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>{{ _('No problems reported.') }}
+                    {% endif %}
+                </div>
+              <div class="col-md-6">
+              
+              </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

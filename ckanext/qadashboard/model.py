@@ -55,6 +55,17 @@ class Problem (domain_object.DomainObject):
             setattr(self, k, v)
             
     @classmethod
+    def all(cls, limit = -1):
+        
+        q = meta.Session.query(cls).\
+            order_by(cls.date_created.desc())
+        
+        if limit > 0:
+            return q.limit(limit).all()
+        else:
+            return q.all()
+            
+    @classmethod
     def get(cls, id):
         if not id:
             return None
@@ -75,6 +86,28 @@ class Problem (domain_object.DomainObject):
         q = model.Session.query(cls).\
             filter_by(package_id = package_id)
         return q.all()
+        
+    @classmethod
+    def in_packages(cls, package_ids, limit = -1):
+        q = meta.Session.query(cls).\
+            filter(cls.package_id.in_(package_ids), cls.current_status != Status.SOLVED)
+            
+        if limit > 0:
+            return q.limit(limit).all()
+        else:
+            return q.all()
+        
+    @classmethod
+    def open(cls, limit = -1):
+        
+        q = meta.Session.query(cls).\
+            filter(cls.current_status != Status.SOLVED).\
+            order_by(cls.date_created.desc())
+        
+        if limit > 0:
+            return q.limit(limit).all()
+        else:
+            return q.all()
             
     
 class ProblemUpdate (domain_object.DomainObject):
