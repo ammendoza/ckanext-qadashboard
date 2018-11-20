@@ -48,6 +48,7 @@ class DashboardController(toolkit.BaseController):
         packages = []
         problems = []
         views = []
+        errors = False
         averages = {
             'problem_total': 0,
             'problem_average': 0.0,
@@ -114,14 +115,13 @@ class DashboardController(toolkit.BaseController):
             averages['my_problem_total'] = len(problems)
     
             #Get qa values for my packages
-            qa_levels, low_qa, my_qa_total = self.__get_qa_values(packages)
+            qa_levels, low_qa, averages['my_qa_total'] = self.__get_qa_values(packages)
             
             #Get views by date
             db_views = _model.TrackingSummary.get_by_date(start_date, end_date, package_ids)
-            pprint.pprint(package_ids)
-            pprint.pprint(db_views)
         
-        
+            for view in db_views:
+                averages['my_views_total'] += view[1]
         
         if packages:
             #Order packages by their QA to get the 5 lowest
@@ -145,6 +145,11 @@ class DashboardController(toolkit.BaseController):
 
             if (averages['my_problem_total'] > 0):
                 averages['my_problem_average'] = round(averages['my_problem_total'] / float(len(packages)), 2)
+        
+        else:
+
+            errors = True
+            
                     
         #Fill dates with no views in order to print zero values
         last_index = 0
@@ -167,6 +172,7 @@ class DashboardController(toolkit.BaseController):
         #Render page
         return toolkit.render('user/dashboard_qa.html', extra_vars={
                 'user_dict': user_dict,
+                'errors': errors,
                 'problem_list': problems[:5],
                 'qa_levels': qa_levels,
                 'low_qa': low_qa[:5],

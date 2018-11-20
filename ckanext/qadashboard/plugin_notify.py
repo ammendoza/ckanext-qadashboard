@@ -4,15 +4,18 @@ import ckan.plugins.toolkit as toolkit
 
 class NotifyProblemsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IRoutes, inherit=True)
 
     # IConfigurer
 
     def update_config(self, config_):
-        toolkit.add_template_directory(config_, 'templates')
+        toolkit.add_template_directory(config_, 'templates/notifyproblems')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'qadashboard')
 
     def before_map(self, map):
+    
+        print 'plugin_notify'
         
         map.connect(
             'dataset_problems', 
@@ -29,6 +32,13 @@ class NotifyProblemsPlugin(plugins.SingletonPlugin):
         )
         
         map.connect(
+            'problem_new', 
+            '/dataset/problems/{package_id}/new',
+            controller='ckanext.qadashboard.problem_controller:ProblemController',
+            action='new_problem'
+        )
+        
+        map.connect(
             'problem_edit', 
             '/dataset/problems/{package_id}/edit/{id}',
             controller='ckanext.qadashboard.problem_controller:ProblemController',
@@ -40,6 +50,13 @@ class NotifyProblemsPlugin(plugins.SingletonPlugin):
             '/dataset/problems/{package_id}/save',
             controller='ckanext.qadashboard.problem_controller:ProblemController',
             action='form_save'
+        )
+        
+        map.connect(
+            'dashboard.problems',
+            '/dashboard/problems',
+            controller='ckanext.qadashboard.problem_controller:ProblemController',
+            action='dashboard'
         )
         
         return map

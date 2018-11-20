@@ -81,7 +81,10 @@ setup(
     entry_points='''
         [ckan.plugins]
         qadashboard=ckanext.qadashboard.plugin:QadashboardPlugin
-	notifyproblems=ckanext.qadashboard.plugin_notify:NotifyProblemsPlugin
+        notifyproblems=ckanext.qadashboard.plugin_notify:NotifyProblemsPlugin
+
+        [paste.paster_command]
+        qadashboard=ckanext.qadashboard.commands:QADashboardCommands
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

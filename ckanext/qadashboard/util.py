@@ -11,18 +11,20 @@ def get_user_packages ():
 
     packages = []
     package_ids = []
-    user_groups = toolkit.get_action('group_list_authz')(context, {})
+    user_organization = toolkit.get_action('organization_list_for_user')(context, {
+					'permission': 'create_dataset'
+                })
     
-    group_search = ''
+    organization_search = ''
     
-    if user_groups:
-        for group in user_groups:
-            if group_search != '':
-                group_search = group_search + ' OR '
-            group_search = group_search + group['name']
+    if user_organization:
+        for organization in user_organization:
+            if organization_search != '':
+                organization_search = organization_search + ' OR '
+            organization_search = organization_search + organization['name']
             
         packages = toolkit.get_action('package_search')(context, {
-                'fq': 'groups:('+ group_search +')',
+                'fq': 'organization:('+ organization_search +')',
                 'include_private': True,
                 'rows': 1000,
                 'sort': 'name asc'
