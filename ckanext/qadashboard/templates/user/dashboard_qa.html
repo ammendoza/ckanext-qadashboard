@@ -1,0 +1,218 @@
+{% extends "user/edit_base.html" %}
+
+{% set user = c.userobj %}
+
+{% block breadcrumb_content %}
+  <li class="active"><a href="{{ h.url_for('dashboard.index') }}">{{ _('Dashboard') }}</a></li>
+{% endblock %}
+
+{% block secondary %}{% endblock %}
+
+{% block primary %}
+  <article class="module">
+    {% block page_header %}
+      <header class="module-content page-header hug">
+        <div class="content_action">
+          {% link_for _('Edit settings'), named_route='user.edit', id=user.name, class_='btn btn-default', icon='cog' %}
+        </div>
+        <ul class="nav nav-tabs">
+          {{ h.build_nav_icon('dashboard.qa', _('QA')) }}
+          {{ h.build_nav_icon('dashboard.index', _('News feed')) }}
+          {{ h.build_nav_icon('dashboard.datasets', _('My Datasets')) }}
+          {{ h.build_nav_icon('dashboard.organizations', _('My Organizations')) }}
+          {{ h.build_nav_icon('dashboard.groups', _('My Groups')) }}
+        </ul>
+      </header>
+    {% endblock %}
+    <div class="module-content">
+      {% if self.page_primary_action() | trim %}
+        <div class="page_primary_action">
+          {% block page_primary_action %}{% endblock %}
+        </div>
+      {% endif %}
+
+      
+      {% block primary_content_inner %}
+        <section class="module module-qadashboard">
+            <div class="module-content">
+                {% resource 'qa-dashboard/qa-dashboard.js' %}
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>{{ _('Number of datasets by openness score') }}</h2>
+                        <canvas id="quality-level" height="150"></canvas>
+                        <script>
+                            var ctx = document.getElementById("quality-level").getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ["0", "1", "2", "3", "4", "5"],
+                                    datasets: [{
+                                        label: '# of datasets',
+                                        data: [
+                                            {% for level in qa_levels %}
+                                                {{ level }},
+                                            {% endfor %}
+                                        ],
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.2)',
+                                            'rgba(54, 162, 235, 0.2)',
+                                            'rgba(255, 206, 86, 0.2)',
+                                            'rgba(75, 192, 192, 0.2)',
+                                            'rgba(153, 102, 255, 0.2)',
+                                            'rgba(255, 159, 64, 0.2)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(255,99,132,1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 206, 86, 1)',
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(153, 102, 255, 1)',
+                                            'rgba(255, 159, 64, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+												stepSize: 1,
+                                                beginAtZero:true
+                                            }
+                                        }]
+                                    }
+                                }
+                            });
+                        </script>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>{{ _('Lowest scored datasets') }}</h2>
+                        {% if low_qa %}
+                            <ul class="list-group">
+                                {% for qa in low_qa %}
+                                    <li class="list-group-item">
+                                        <span class="badge">{{ qa.level }}</span>
+                                        <a href="{{ h.url_for('dataset.read', id=qa.package.name) }}">{{ qa.package.title }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                        <h2>{{ _('Last problems reported') }}</h2>
+                        {% if problem_list %}
+                            <ul class="list-group">
+                                {% for problem in problem_list %}
+                                    <li class="list-group-item">
+                                        <span class="badge">{{ problem.current_status }}</span>
+                                        <a href="{{ h.url_for('problem_detail', id=problem.id, package_id=problem.package_id) }}">{{ problem.problem_type }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>{{ _('No problems reported.') }}
+                        {% endif %}
+                    </div>
+                  <div class="col-md-6">
+					    <h2>{{ _('Dataset views') }}</h2>
+                        <canvas id="dataset-views" height="150"></canvas>
+                        <script>
+                            var ctx = document.getElementById("dataset-views").getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: [
+										{% for view in views %}
+											'{{ view['label'] }}',
+										{% endfor %}
+									],
+                                    datasets: [{
+                                        label: 'views',
+                                        data: [
+                                            {% for view in views %}
+												{{ view['data'] }},
+											{% endfor %}
+                                        ],
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                                        fill: false
+                                    }]
+                                },
+                                options: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                beginAtZero:true
+                                            }
+                                        }]
+                                    }
+                                }
+                            });
+                        </script>
+                  </div>
+                </div>
+				<div class="row">
+                    <div class="col-md-12">	
+						<h2>{{ _('Average values') }}</h2>
+						{% set show_comparison = averages['show_comparison'] %}
+						<table class="table">
+							<thead>
+								<tr>
+									<th></th>
+									{% if show_comparison %}
+										<th>{{ _('My dataset average') }}</th>
+										<th>My total</th>
+									{% endif %}
+									<th>{{ _('Site dataset average') }}</th>
+									<th>{{ _('Site total') }}</th>
+							</thead>
+							<tbody>
+								<tr>
+									<th>{{ _('Openness score') }}</th>
+									<td>{{ averages['my_qa_average'] }}</td>
+									<td>-</td>
+									{% if show_comparison %}
+										<td>{{ averages['qa_average'] }}</td>
+										<td>-</td>
+									{% endif %}
+								</tr>
+								<tr>
+									<th>{{ _('Views') }}</</th>
+									<td>{{ averages['my_views_average'] }}</td>
+									<td>{{ averages['my_views_total'] }}</td>
+									{% if show_comparison %}
+										<td>{{ averages['views_average'] }}</td>
+										<td>{{ averages['views_total'] }}</td>
+									{% endif %}
+								</tr>
+								<tr>
+									<th>{{ _('Problems') }}</</th>
+									<td>{{ averages['my_problem_average'] }}</td>
+									<td>{{ averages['my_problem_total'] }}</td>
+									{% if show_comparison %}
+										<td>{{ averages['problem_average'] }}</td>
+										<td>{{ averages['problem_total'] }}</td>
+									{% endif %}
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-md-6">	
+					</div>
+				</div>
+            </div>
+        </section>
+    {% endblock %}
+     
+    </div>
+  </article>
+{% endblock %}

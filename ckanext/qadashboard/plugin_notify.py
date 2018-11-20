@@ -13,11 +13,6 @@ class NotifyProblemsPlugin(plugins.SingletonPlugin):
         toolkit.add_resource('fanstatic', 'qadashboard')
 
     def before_map(self, map):
-        map.connect(
-            '/dashboard/qa',
-            controller='ckanext.qadashboard.db_controller:DashboardController',
-            action='view'
-        )
         
         map.connect(
             'dataset_problems', 

@@ -15,6 +15,7 @@ class QadashboardPlugin(plugins.SingletonPlugin):
         
     def before_map(self, map):
         map.connect(
+            'dashboard.qa',
             '/dashboard/qa',
             controller='ckanext.qadashboard.db_controller:DashboardController',
             action='view'

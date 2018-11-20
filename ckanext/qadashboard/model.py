@@ -1,10 +1,11 @@
 import ckan.model.domain_object as domain_object
 import ckan.model.meta as meta
 import ckan.model.types as _types
+import ckan.model.tracking as tracking
 import datetime
 
 from ckan import model
-from sqlalchemy import types, Column, Table, ForeignKey, orm
+from sqlalchemy import types, Column, Table, ForeignKey, orm, func
 from sqlalchemy.orm import mapper
 
 class Status(object):
@@ -121,6 +122,23 @@ class ProblemUpdate (domain_object.DomainObject):
             join(model.user.User).\
             filter(cls.problem_id == problem_id)
         return q.all()
+        
+       
+class TrackingSummary (tracking.TrackingSummary):
+
+    @classmethod
+    def get_by_date (cls, start_date, end_date, package_ids=None):
+    
+        q = model.Session.query(tracking.TrackingSummary.tracking_date, func.sum(tracking.TrackingSummary.count)).\
+            group_by(tracking.TrackingSummary.tracking_date).\
+            order_by(tracking.TrackingSummary.tracking_date)
+        
+        if package_ids:
+           q.filter(cls.package_id.in_(package_ids))
+            
+        return q.all()
+        
+        
 
 mapper(ProblemType, problem_type_table)
 mapper(Problem, problem_table, properties={
