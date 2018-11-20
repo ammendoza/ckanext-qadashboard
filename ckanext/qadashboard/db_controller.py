@@ -5,6 +5,7 @@ import ckan.logic as logic
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 import ckanext.qadashboard.model as _model
+import ckanext.qadashboard.util as _util
 
 import ast
 import pprint
@@ -106,35 +107,14 @@ class DashboardController(toolkit.BaseController):
         else:
         
             #Regular users can only edit packages for groups that they are authorized for
-            user_groups = toolkit.get_action('group_list_authz')(context, {})
-            group_search = ''
-            
-            if user_groups:
-                for group in user_groups:
-                    if group != '':
-                        group_search = group_search + ' OR '
-                    group_search = group_search + group['name']
+            packages, package_ids = _util.get_user_packages()
                     
-                packages = toolkit.get_action('package_search')(context, {
-                        'fq': 'group:('+ group_search +')',
-                        'include_private': True,
-                        'rows': 1000,
-                        'sort': 'name asc'
-                    })
-                
-                if 'results' in packages:
-                    packages = packages['results']
-                    
-                    #Get last 5 problems for datasets that the user can edit
-                    package_ids = []
-                    for package in packages:
-                        package_ids.append(package['id'])
-
-                    problems = _model.Problem.in_packages(package_ids)
-                    averages['my_problem_total'] = len(problems)
-            
-                    #Get qa values for my packages
-                    qa_levels, low_qa, my_qa_total = self.__get_qa_values(packages)
+            #Get last 5 problems for datasets that the user can edit
+            problems = _model.Problem.in_packages(package_ids, _model.Status.SOLVED)
+            averages['my_problem_total'] = len(problems)
+    
+            #Get qa values for my packages
+            qa_levels, low_qa, my_qa_total = self.__get_qa_values(packages)
         
         if packages:
             #Order packages by their QA to get the 5 lowest

@@ -1,3 +1,4 @@
+import ckan.authz as authz
 import ckan.lib.base as base
 import ckan.logic as logic
 import ckan.model as model
@@ -109,4 +110,32 @@ class ProblemController(toolkit.BaseController):
         model.Session.commit()
 
         toolkit.redirect_to('problem_detail', id=problem.id, package_id=package_id)
+        
+    def dashboard(self):
+    
+        context = {'for_view': True, 'user': c.user,
+                   'auth_user_obj': c.userobj}
+        data_dict = {'user_obj': c.userobj, 'include_datasets': True}
+        
+        c.is_sysadmin = authz.is_sysadmin(c.user)
+        try:
+            user_dict = logic.get_action('user_show')(context, data_dict)
+        except logic.NotFound:
+            h.flash_error(_('Not authorized to see this page'))
+            h.redirect_to(controller='user', action='login')
+        except logic.NotAuthorized:
+            abort(403, _('Not authorized to see this page'))
+    
+        if c.userobj.sysadmin:
+        
+            problems = _model.Problem.all()
+        
+        else:
             
+            packages, package_ids = _util.get_user_packages()
+            problems = _model.Problem.in_packages(package_ids)
+            
+        return toolkit.render('user/dashboard_problems.html', extra_vars={
+                'user_dict': user_dict,
+                'problems': problems
+            })

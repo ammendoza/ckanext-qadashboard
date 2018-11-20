@@ -49,4 +49,11 @@ class QadashboardPlugin(plugins.SingletonPlugin):
             action='form_save'
         )
         
+        map.connect(
+            'dashboard.problems',
+            '/dashboard/problems',
+            controller='ckanext.qadashboard.problem_controller:ProblemController',
+            action='dashboard'
+        )
+        
         return map

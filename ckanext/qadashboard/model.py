@@ -89,9 +89,12 @@ class Problem (domain_object.DomainObject):
         return q.all()
         
     @classmethod
-    def in_packages(cls, package_ids, limit = -1):
+    def in_packages(cls, package_ids, status = -1, limit = -1):
         q = meta.Session.query(cls).\
-            filter(cls.package_id.in_(package_ids), cls.current_status != Status.SOLVED)
+            filter(cls.package_id.in_(package_ids))
+            
+        if status != -1:
+            q.filter(cls.current_status != status)
             
         if limit > 0:
             return q.limit(limit).all()
