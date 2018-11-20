@@ -1,5 +1,6 @@
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
+import pprint
 
 from ckan.common import c
 
@@ -11,6 +12,7 @@ def get_user_packages ():
     packages = []
     package_ids = []
     user_groups = toolkit.get_action('group_list_authz')(context, {})
+    
     group_search = ''
     
     if user_groups:
@@ -20,12 +22,12 @@ def get_user_packages ():
             group_search = group_search + group['name']
             
         packages = toolkit.get_action('package_search')(context, {
-                'fq': 'group:('+ group_search +')',
+                'fq': 'groups:('+ group_search +')',
                 'include_private': True,
                 'rows': 1000,
                 'sort': 'name asc'
             })
-        
+
         if 'results' in packages:
             packages = packages['results']
         

@@ -5,6 +5,21 @@
     {% block problem_form %}
         <section class="module module-resource">
             <div class="module-content">
+				<h2>
+				{% if action == 'new' %}
+					{{ _('Add a problem') }}
+				{% else %}
+					{{ _('Update problem') }}
+				{% endif %}
+				</h2>
+				
+				
+				{% if errors.msg %}
+					<p class="bg-danger text-danger" style="padding: 5px;"><strong>{{ _('Error') }}:</strong>
+						{{ _(errors.msg) }}
+					</p>
+				{% endif %}
+			
                 <form id="problem-edit" class="dataset-form" method="post" action="{{ h.url_for('problem_save', package_id=pkg.name) }}" data-module="basic-form" novalidate>
                 
                 <input type="hidden" name="package_id" value="{{ c.pkg.id }}" />
@@ -13,8 +28,7 @@
                 {% if action == 'new' %}
                 
                     {% block problem_title %}
-                        {{ form.input('title', id='field-title', label=_('Title'), placeholder='', value='', error='', classes=['control-medium'], attrs={'class': 'form-control'}) }}
-                        {% if errors.title %}<span class="error-block">{{ errors.title }}</span>{% endif %}
+                        {{ form.input('title', id='field-title', label=_('Title'), placeholder='', value='', error=errors.title, classes=['control-medium'], attrs={'class': 'form-control'}) }}
                     {% endblock %}
                     
                     {% block problem_detail %}
@@ -35,17 +49,24 @@
                     <input type="hidden" name="id" value="{{ problem.id }}" />
                     
                     {% block problem_status %}
-                    
-                        <div class="form-group control-medium">
-                          <label for="field-status" class="control-label">{{ _('Status') }}</label>
-                          <div class="controls">
-                            <select id="field-status" name="status" class="form-control">
-                              {% for option in status %}
-                                <option value="{{ option }}" {% if problem.current_status == option %}selected="selected"{% endif %}>{{ option }}</option>
-                              {% endfor %}
-                            </select>
-                          </div>
-                        </div>
+					
+						{% if h.check_access('package_update', {'id': c.pkg.id }) %}
+							<div class="form-group control-medium">
+							  <label for="field-status" class="control-label">{{ _('Status') }}</label>
+							  <div class="controls">
+								<select id="field-status" name="status" class="form-control">
+								  {% for option in status %}
+									<option value="{{ option }}" {% if problem.current_status == option %}selected="selected"{% endif %}>{{ option }}</option>
+								  {% endfor %}
+								</select>
+							  </div>
+							</div>
+							
+						{% else %}
+							
+							 <input type="hidden" name="status" value="{{ problem.current_status }}" />
+							
+						{% endif %}
                     
                     {% endblock %}
                 

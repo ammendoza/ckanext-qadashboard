@@ -36,6 +36,13 @@ class QadashboardPlugin(plugins.SingletonPlugin):
         )
         
         map.connect(
+            'problem_new', 
+            '/dataset/problems/{package_id}/new',
+            controller='ckanext.qadashboard.problem_controller:ProblemController',
+            action='new_problem'
+        )
+        
+        map.connect(
             'problem_edit', 
             '/dataset/problems/{package_id}/edit/{id}',
             controller='ckanext.qadashboard.problem_controller:ProblemController',

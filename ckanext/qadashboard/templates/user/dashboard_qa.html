@@ -112,12 +112,12 @@
                                 {% for problem in problem_list %}
                                     <li class="list-group-item">
                                         <span class="badge">{{ problem.current_status }}</span>
-                                        <a href="{{ h.url_for('problem_detail', id=problem.id, package_id=problem.package_id) }}">{{ problem.problem_type }}</a>
+                                        <a href="{{ h.url_for('problem_detail', id=problem.id, package_id=problem.package_id) }}">{{ problem.title }}</a>
                                     </li>
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <p>{{ _('No problems reported.') }}
+                            <p>{{ _('No problems reported for your datasets.') }}</p>
                         {% endif %}
                     </div>
                   <div class="col-md-6">

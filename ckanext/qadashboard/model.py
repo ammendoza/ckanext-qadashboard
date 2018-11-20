@@ -25,7 +25,7 @@ problem_type_table = Table('problem_type', meta.metadata,
 problem_table = Table('problem', meta.metadata,
                 Column('id', types.UnicodeText, primary_key=True, default=_types.make_uuid),
                 Column('package_id', types.UnicodeText, ForeignKey('package.id')),
-                #Column('title', types.UnicodeText),
+                Column('title', types.UnicodeText),
                 Column('problem_type', types.UnicodeText, ForeignKey('problem_type.id')),
                 Column('current_status', types.UnicodeText, default=Status.OPEN),
                 Column('creator_id', types.UnicodeText, ForeignKey('user.id')),
@@ -38,6 +38,8 @@ problem_update_table = Table('problem_update', meta.metadata,
                 Column('problem_id', types.UnicodeText, ForeignKey('problem.id')),
                 Column('user_id', types.UnicodeText, ForeignKey('user.id')),
                 Column('status_id', types.UnicodeText),
+                Column('status_changed', types.Boolean, default=False),
+                Column('date', types.DateTime, default=datetime.datetime.now),
                 Column('notes', types.UnicodeText))
                 
 class ProblemType (domain_object.DomainObject):
@@ -123,7 +125,8 @@ class ProblemUpdate (domain_object.DomainObject):
     def by_problem(cls, problem_id):
         q = model.Session.query(cls, model.user.User).\
             join(model.user.User).\
-            filter(cls.problem_id == problem_id)
+            filter(cls.problem_id == problem_id).\
+            order_by(cls.date.asc())
         return q.all()
         
        
@@ -132,13 +135,17 @@ class TrackingSummary (tracking.TrackingSummary):
     @classmethod
     def get_by_date (cls, start_date, end_date, package_ids=None):
     
-        q = model.Session.query(tracking.TrackingSummary.tracking_date, func.sum(tracking.TrackingSummary.count)).\
-            group_by(tracking.TrackingSummary.tracking_date).\
-            order_by(tracking.TrackingSummary.tracking_date)
+        if not package_ids:
+            q = model.Session.query(tracking.TrackingSummary.tracking_date, func.sum(tracking.TrackingSummary.count)).\
+                group_by(tracking.TrackingSummary.tracking_date).\
+                order_by(tracking.TrackingSummary.tracking_date)
         
-        if package_ids:
-           q.filter(cls.package_id.in_(package_ids))
-            
+        else:
+            q = model.Session.query(tracking.TrackingSummary.tracking_date, func.sum(tracking.TrackingSummary.count)).\
+                filter(tracking.TrackingSummary.package_id.in_(package_ids)).\
+                group_by(tracking.TrackingSummary.tracking_date).\
+                order_by(tracking.TrackingSummary.tracking_date)
+
         return q.all()
         
         

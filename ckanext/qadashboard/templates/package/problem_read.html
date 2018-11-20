@@ -6,19 +6,19 @@
 {% block breadcrumb_content %}
   {{ super() }}
   <li><a href="{{ h.url_for('dataset_problems', package_id=pkg.name) }}">{{ _('Problems') }}</a></li>
-  <li class="active"><a href="">{{ _('Problem name') | truncate(30) }}</a></li>
+  <li class="active"><a href="">{{ problem.title | truncate(30) }}</a></li>
 {% endblock %}
 
 {% block primary_content_inner %}
     {% block problem_detail %}
-		{% if h.check_access('package_update', {'id':pkg.id }) %}
+		{% if c.user %}
 			{% link_for _('Update problem'), named_route='problem_edit', id=problem.id, package_id=pkg.name, class_='btn btn-default pull-right', icon='wrench' %}
 		{% endif %}
 
-		<h1>{% block page_heading %}{{ _('Problem name') }}{% endblock %}</h1>
+		<h1>{% block page_heading %}{{ problem.title }}{% endblock %}</h1>
 	  
 		<div class="notes embedded-content">
-			<p>{{ problem.description }}</p>
+			<p>{{ h.render_markdown(problem.description) }}</p>
 		</div>
 		<table class="table table-striped table-bordered table-condensed">
 			<tbody>
@@ -56,14 +56,16 @@
 							{{ h.gravatar((update.User.email_hash if update.User else ''), size=22) }} {{ update.User.name }}
 						</a>
 						{% if aux_status != update.ProblemUpdate.status_id %}
-							{{ ('changed status to ') }} <strong>{{ update.ProblemUpdate.status_id }}</strong>:
+							{{ ('changed status to ') }} <strong>{{ update.ProblemUpdate.status_id }}</strong>{% if update.ProblemUpdate.notes %}:{% endif %}
 						{% else %}
-							{{ _('added a comment') }}:
+							{{ _('added a comment') }}{% if update.ProblemUpdate.notes %}:{% endif %}
 						{% endif %}
 						
 					</p>
 
-					<p>{{ update.ProblemUpdate.notes }}</p>
+					{% if update.ProblemUpdate.notes %}
+						<p>{{ h.render_markdown(update.ProblemUpdate.notes) }}</p>
+					{% endif %}
 					
 					<hr />
 					

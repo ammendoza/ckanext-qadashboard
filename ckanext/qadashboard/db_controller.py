@@ -115,10 +115,17 @@ class DashboardController(toolkit.BaseController):
     
             #Get qa values for my packages
             qa_levels, low_qa, my_qa_total = self.__get_qa_values(packages)
+            
+            #Get views by date
+            db_views = _model.TrackingSummary.get_by_date(start_date, end_date, package_ids)
+            pprint.pprint(package_ids)
+            pprint.pprint(db_views)
+        
+        
         
         if packages:
             #Order packages by their QA to get the 5 lowest
-            low_qa = sorted(low_qa, key=lambda k: k['level'], reverse=True)
+            low_qa = sorted(low_qa, key=lambda k: k['level'])
             
             #Get averages
             if (averages['qa_total'] > 0):
@@ -174,7 +181,7 @@ class DashboardController(toolkit.BaseController):
         low_qa = []
         qa_total = 0
         
-        for i in range(0,5):
+        for i in range(0,6):
             qa_levels.append(0)
     
         for package in packages:

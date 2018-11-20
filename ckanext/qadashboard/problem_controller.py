@@ -4,6 +4,7 @@ import ckan.logic as logic
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 import ckanext.qadashboard.model as _model
+import ckanext.qadashboard.util as _util
 
 from ckan.common import _, request
 
@@ -52,9 +53,8 @@ class ProblemController(toolkit.BaseController):
                 'user': problem_data.User
             })
         
-    def edit_problem(self, id, package_id):
-  
-        errors = {}
+    def edit_problem(self, id, package_id, errors={}):
+
         problem = _model.Problem.get(id)
         problem_types = _model.ProblemType.all()
 
@@ -67,15 +67,15 @@ class ProblemController(toolkit.BaseController):
                 'errors': errors
             })
             
-    def new_problem(self, id, package_id):
+    def new_problem(self, package_id, errors = {}):
 
-             
         problem = {}
-        errors = {}
+        problem_types = _model.ProblemType.all()
 
         return toolkit.render('package/problem_form.html', extra_vars={
                 'action': 'new',
                 'problem': problem,
+                'problem_types': problem_types,
                 'errors': errors
             })
     
@@ -85,31 +85,64 @@ class ProblemController(toolkit.BaseController):
         params = request.params
         action = params.get('action')
         package_id = params.get('package_id')
+        title = params.get('title')
+        problem_id = params.get('id')
+        status = params.get('status')
         user_id = c.userobj.id
         description = params.get('description')
              
         errors = {}
         
         if action == 'new':
-            #Create new problem
-            problem = _model.Problem(package_id=package_id, creator_id=user_id, problem_type=params.get('type'), description=description)
-            model.Session.add(problem)
-        else:
-            problem_id = params.get('id')
-            status = params.get('status')
+        
+            if not title:
+                errors['title'] = ['You must provide a title']
+                
+            if not description:
+                errors['description'] = ['You must provide a description']
+        
+            if not errors:
+                #Create new problem
+                problem = _model.Problem(package_id=package_id, title=title, creator_id=user_id, problem_type=params.get('type'), description=description)
+                model.Session.add(problem)
             
+        else:
+
             #Update problem entity
             problem = _model.Problem.get(problem_id)
-            problem.current_status = status
             
-            #Create new problem update
-            problem_update = _model.ProblemUpdate(problem_id=problem_id, user_id=user_id, status_id=status, notes=description)
-            model.Session.add(problem_update)
+            if problem.current_status == status and not description:
             
-        #Commit model changes
-        model.Session.commit()
+                errors = {'msg': u'No changes made'}
+            
+            else:
+                
+                status_changed = False
+                if problem.current_status != status:
+                    status_changed = True
+            
+                problem.current_status = status
+                
+                #Create new problem update
+                problem_update = _model.ProblemUpdate(problem_id=problem_id, 
+                                    user_id=user_id, 
+                                    status_id=status, 
+                                    status_changed=status_changed, 
+                                    notes=description)
+                model.Session.add(problem_update)
+            
+        if len(errors) == 0:
+            #Commit model changes
+            model.Session.commit()
 
-        toolkit.redirect_to('problem_detail', id=problem.id, package_id=package_id)
+            toolkit.redirect_to('problem_detail', id=problem.id, package_id=package_id)
+        
+        else:
+            if action == 'new':
+                return self.new_problem(package_id, errors)
+            else:
+                return self.edit_problem(problem_id, package_id, errors)
+                
         
     def dashboard(self):
     
