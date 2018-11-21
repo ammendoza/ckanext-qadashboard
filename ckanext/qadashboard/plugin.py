@@ -14,8 +14,7 @@ class QadashboardPlugin(plugins.SingletonPlugin):
         toolkit.add_resource('fanstatic', 'qa-dashboard')
         
     def before_map(self, map):
-    
-        print 'plugin'
+
         map.connect(
             'dashboard.qa',
             '/dashboard/qa',

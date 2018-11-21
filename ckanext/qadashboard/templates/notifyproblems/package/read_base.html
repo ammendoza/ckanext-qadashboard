@@ -2,5 +2,7 @@
 
 {% block content_primary_nav %}
   {{ super() }}
-  {{ h.build_nav_icon('dataset_problems', _('Problems'), package_id=pkg.name, icon='exclamation-triangle') }}
+  {% if h.check_access('package_update', {'id': c.pkg.id }) %}
+    {{ h.build_nav_icon('dataset_problems', _('Problems'), package_id=pkg.name, icon='exclamation-triangle') }}
+  {% endif %}
 {% endblock %}

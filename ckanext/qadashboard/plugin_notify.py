@@ -14,8 +14,6 @@ class NotifyProblemsPlugin(plugins.SingletonPlugin):
         toolkit.add_resource('fanstatic', 'qadashboard')
 
     def before_map(self, map):
-    
-        print 'plugin_notify'
         
         map.connect(
             'dataset_problems', 

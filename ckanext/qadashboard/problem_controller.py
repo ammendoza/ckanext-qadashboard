@@ -6,23 +6,19 @@ import ckan.plugins.toolkit as toolkit
 import ckanext.qadashboard.model as _model
 import ckanext.qadashboard.util as _util
 
-from ckan.common import _, request
+from ckan.common import _, c, request
 
-c = toolkit.c
 abort = base.abort
 
 class ProblemController(toolkit.BaseController):
 
-    def __call__(self, environ, start_response):
-
-        # Check if user can read the package
-        routes_dict = environ['pylons.routes_dict']
-        
-        if 'package_id' in routes_dict:
+    def __check_permissions__(self, package_id=None):
+    
+        if package_id:
             context = {'model': model, 'session': model.Session,
                    'user': c.user, 'for_view': True,
                    'auth_user_obj': c.userobj}
-            data_dict = {'id': routes_dict['package_id']}
+            data_dict = {'id': package_id}
             try:
                 c.pkg_dict = logic.get_action('package_show')(context, data_dict)
                 c.pkg = context['package']
@@ -31,11 +27,14 @@ class ProblemController(toolkit.BaseController):
                 abort(404, _('Dataset not found'))
             except logic.NotAuthorized:
                     abort(403, _('Unauthorized to read dataset %s') % id)
-        
-        return toolkit.BaseController.__call__(self, environ, start_response)
+                 
+        if not c.userobj:
+            abort(403, _('Unauthorized to read problems'))
 
     def view_dataset(self, package_id):
-      
+        
+        self.__check_permissions__(package_id)
+        
         problems = _model.Problem.by_package(package_id=c.pkg.id)
 
         return toolkit.render('package/problems.html', extra_vars={
@@ -43,7 +42,9 @@ class ProblemController(toolkit.BaseController):
             })
         
     def view_problem(self, id, package_id):
-                
+    
+        self.__check_permissions__(package_id)
+       
         problem_data = _model.Problem.get_related(id)
         problem_updates = _model.ProblemUpdate.by_problem(problem_id=id)
 
@@ -54,6 +55,8 @@ class ProblemController(toolkit.BaseController):
             })
         
     def edit_problem(self, id, package_id, errors={}):
+    
+        self.__check_permissions__(package_id)
 
         problem = _model.Problem.get(id)
         problem_types = _model.ProblemType.all()
@@ -68,6 +71,8 @@ class ProblemController(toolkit.BaseController):
             })
             
     def new_problem(self, package_id, errors = {}):
+    
+        self.__check_permissions__(package_id)
 
         problem = {}
         problem_types = _model.ProblemType.all()
@@ -80,6 +85,8 @@ class ProblemController(toolkit.BaseController):
             })
     
     def form_save(self, package_id):
+    
+        self.__check_permissions__(package_id)
 
         #Get common form parameters
         params = request.params
