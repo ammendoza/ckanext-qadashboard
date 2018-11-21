@@ -90,10 +90,26 @@ class Problem (domain_object.DomainObject):
             filter_by(package_id = package_id)
         return q.all()
         
+    @classmethod     
+    def by_type(cls, problem_type):
+        q = model.Session.query(cls).\
+            filter_by(problem_type = problem_type)
+        return q.all()
+        
+    @classmethod     
+    def by_package_and_type(cls, package_id, problem_type):
+        q = model.Session.query(cls).\
+            filter_by(package_id = package_id).\
+            filter_by(problem_type = problem_type)
+        return q.all()
+        
     @classmethod
-    def in_packages(cls, package_ids, status = -1, limit = -1):
+    def in_packages(cls, package_ids, status = -1, problem_type = None, limit = -1):
         q = meta.Session.query(cls).\
             filter(cls.package_id.in_(package_ids))
+            
+        if type:
+            q.filter(problem_type == problem_type)
             
         if status != -1:
             q.filter(cls.current_status != status)

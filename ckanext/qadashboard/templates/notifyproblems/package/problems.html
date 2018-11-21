@@ -6,12 +6,28 @@
 
   <h1 class="hide-heading">{% block page_heading %}{{ _('Notified problems') }}{% endblock %}</h1>
   
+  {% if c.user %}
+    <div class="page_primary_action">
+        {% link_for _('Add problem'), named_route='problem_new', package_id=pkg.name, class_='btn btn-primary pull-right', icon='plus-square' %}
+    </div>
+  {% endif %}
+  
+  {% block problem_filter %}
+    <form class="form-inline filter-problems" method="post" action="{{ h.url_for('dataset_problems', package_id=pkg.name) }}">
+        <div class="form-group control-medium">
+          <label for="field-type" class="control-label">{{ _('Filter by type') }}</label>
+          <select id="field-type" name="filter" class="form-control">
+            <option value="" {% if selected_type %}selected="selected"{% endif %}>{{ _('All') }}</option>
+            {% for option in types %}
+              <option value="{{ option.id }}" {% if selected_type == option.id %}selected="selected"{% endif %}>{{ option.name }}</option>
+            {% endfor %}
+         </select>
+        </div>
+        <button type="submit" class="btn btn-default">{{ _('Filter') }}</button>
+    </form>
+  {% endblock %}
+  
   {% block problem_table %}
-	{% if c.user %}
-		<div class="page_primary_action">
-			{% link_for _('Add problem'), named_route='problem_new', package_id=pkg.name, class_='btn btn-primary', icon='plus-square' %}
-		</div>
-	{% endif %}
 	
     <ul class="list-group">
         {% for problem in problems %}

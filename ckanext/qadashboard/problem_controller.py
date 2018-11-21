@@ -35,9 +35,19 @@ class ProblemController(toolkit.BaseController):
         
         self.__check_permissions__(package_id)
         
-        problems = _model.Problem.by_package(package_id=c.pkg.id)
+        params = request.params
+        filter = params.get('filter')
+        
+        problem_types = _model.ProblemType.all()
+        
+        if filter:
+            problems = _model.Problem.by_package_and_type(package_id=c.pkg.id, problem_type=filter)
+        else:
+            problems = _model.Problem.by_package(package_id=c.pkg.id)
 
         return toolkit.render('package/problems.html', extra_vars={
+                'types' : problem_types,
+                'selected_type': filter,
                 'problems': problems
             })
         
@@ -165,17 +175,30 @@ class ProblemController(toolkit.BaseController):
             h.redirect_to(controller='user', action='login')
         except logic.NotAuthorized:
             abort(403, _('Not authorized to see this page'))
+            
+        params = request.params
+        filter = params.get('filter')
+        
+        problem_types = _model.ProblemType.all()
     
         if c.userobj.sysadmin:
         
-            problems = _model.Problem.all()
-        
+            if filter:
+                problems = _model.Problem.by_type(filter)
+            else:
+                problems = _model.Problem.all()
         else:
             
             packages, package_ids = _util.get_user_packages()
-            problems = _model.Problem.in_packages(package_ids)
+            
+            if filter:
+                problems = _model.Problem.in_packages(package_ids, problem_type = filter)
+            else:
+                problems = _model.Problem.in_packages(package_ids)
             
         return toolkit.render('user/dashboard_problems.html', extra_vars={
                 'user_dict': user_dict,
+                'types' : problem_types,
+                'selected_type': filter,
                 'problems': problems
             })

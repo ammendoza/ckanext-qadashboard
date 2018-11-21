@@ -56,10 +56,12 @@
 							{{ h.gravatar((update.User.email_hash if update.User else ''), size=22) }} {{ update.User.name }}
 						</a>
 						{% if aux_status != update.ProblemUpdate.status_id %}
-							{{ ('changed status to ') }} <strong>{{ update.ProblemUpdate.status_id }}</strong>{% if update.ProblemUpdate.notes %}:{% endif %}
+							{{ ('changed status to ') }} <strong>{{ update.ProblemUpdate.status_id }}</strong>{% if update.ProblemUpdate.notes %}{% endif %}
 						{% else %}
-							{{ _('added a comment') }}{% if update.ProblemUpdate.notes %}:{% endif %}
+							{{ _('added a comment') }}{% if update.ProblemUpdate.notes %}{% endif %}
 						{% endif %}
+                        
+                        {{ _('on') }} {{ h.render_datetime(update.ProblemUpdate.date, with_hours=True) }}:
 						
 					</p>
 
