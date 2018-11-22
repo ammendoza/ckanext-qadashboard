@@ -72,6 +72,25 @@ Config Settings
 This extension does not have any additional configuration settings.
 
 
+How to use
+------------
+
+Once installed and enabled, navigate to the user dashboard in order to view the QA Dashboard:
+
+.. image:: https://github.com/ammendoza/ckanext-qadashboard/raw/master/img/qa-dashboard.jpg
+
+Problems reported for datasets which the current user can edit can be viewed from the "Problems" tab:
+
+.. image:: https://github.com/ammendoza/ckanext-qadashboard/raw/master/img/qa-dashboard-problems.jpg
+
+All users can view problems reported on a dataset from the "Problems" tab at the dataset detail page. From this tab, logged in users can also add a new problem for the dataset by clicking "Add problem".
+
+.. image:: https://github.com/ammendoza/ckanext-qadashboard/raw/master/img/dataset-problems.jpg
+ 
+The problem detail page shows all information about the problem added and user updates. Logged in users can add updates by clicking the "Update problem" button, but only users with permissions to edit the dataset can change problem's status.
+
+.. image:: https://github.com/ammendoza/ckanext-qadashboard/raw/master/img/problem-detail.jpg
+
 License
 ---------------
 
