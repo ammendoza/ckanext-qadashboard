@@ -85,7 +85,7 @@ Problems reported for datasets which the current user can edit can be viewed fro
 
 All users can view problems reported on a dataset from the "Problems" tab at the dataset detail page. From this tab, logged in users can also add a new problem for the dataset by clicking "Add problem".
 
-.. image:: https://github.com/ammendoza/ckanext-qadashboard/raw/master/img/dataset-problems.jpg
+.. image:: https://github.com/ammendoza/ckanext-qadashboard/raw/master/img/dataset-problems.png
  
 The problem detail page shows all information about the problem added and user updates. Logged in users can add updates by clicking the "Update problem" button, but only users with permissions to edit the dataset can change problem's status.
 
