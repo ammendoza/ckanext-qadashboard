@@ -2,16 +2,19 @@
 ckanext-qadashboard
 =============
 
-.. Put a description of your extension here:
-   What does it do? What features does it have?
-   Consider including some screenshots or embedding a video!
+``ckanext-qadashboard`` enables a QA based user dashboard and a problem notification system for datasets. This extension contains two plugins:
 
+- **qadashboard**: enables a QA user dashboard showing basic information about user's datasets (qa levels, lowest rated datasets, last added problems, last week views and dataset/site average values).
+- **notifyproblems**: enables the problem notification subsystem and adds a "Problems" menu option for each dataset and to the user dashboard.
 
 ------------
 Requirements
 ------------
 
 This extension has been tested with CKAN 2.8 only.
+It requires that the page view tracking CKAN feature is enabled and that the following CKAN extensions are installed and enabled along with their requirements:
+
+- ckanext-qa: https://github.com/ckan/ckanext-qa
 
 
 ------------
@@ -32,7 +35,7 @@ To install ckanext-qadashboard:
 
      paster --plugin=ckanext-qadashboard qadashboard initdb --config=/etc/ckan/default/production.ini
 
-4. Add ``qadashboard`` to the ``ckan.plugins`` setting in your CKAN
+4. Add ``qadashboard`` and ``notifyproblems`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
@@ -46,4 +49,10 @@ Config Settings
 ---------------
 
 This extension does not have any additional configuration settings.
+
+---------------
+License
+---------------
+
+This extension is published under the GNU Affero General Public License v3 (see LICENSE).
 
